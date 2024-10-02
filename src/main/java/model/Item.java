@@ -2,7 +2,6 @@ package model;
 
 import lombok.*;
 
-import java.time.LocalDate;
 
 @ToString
 @Setter
@@ -17,7 +16,4 @@ public class Item {
     private Double unitPrice;
     private Integer qtyOnHand;
 
-
-    public Item(String itemCode, String description, String packSize, double unitPrice, int qtyOnHand, Object o) {
-    }
 }

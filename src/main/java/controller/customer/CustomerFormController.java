@@ -2,7 +2,6 @@ package controller.customer;
 
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import controller.item.ItemService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -124,10 +123,10 @@ public class CustomerFormController implements Initializable {
     void btnDeleteOnAction(ActionEvent event) {
 
         if (customerController.deleteCustomer(txtCustomerId.getText())) {
-            new Alert(Alert.AlertType.INFORMATION, "" + txtCustomerId.getText() + ": Customer Deleted !!").show();
+            new Alert(Alert.AlertType.INFORMATION,  txtCustomerId.getText() + ": Customer Deleted !!").show();
             loadTable();
         } else {
-            new Alert(Alert.AlertType.INFORMATION, "" + txtCustomerId.getText() + ": Customer not Deleted !!").show();
+            new Alert(Alert.AlertType.INFORMATION,  txtCustomerId.getText() + ": Customer not Deleted !!").show();
         }
     }
 

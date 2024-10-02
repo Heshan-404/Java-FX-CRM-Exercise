@@ -10,6 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.Item;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -88,8 +89,7 @@ public class ItemFormController implements Initializable {
                 Double.parseDouble(txtUnitPrice.getText()),
                 Integer.parseInt(txtQty.getText())
         );
-        Boolean isAdd = itemController.addItem(item);
-        if (isAdd) {
+        if (itemController.addItem(item)) {
             new Alert(Alert.AlertType.INFORMATION, "Item Added!!").show();
             loadTable();
         } else {

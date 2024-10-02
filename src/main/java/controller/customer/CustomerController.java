@@ -2,7 +2,6 @@ package controller.customer;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
 import model.Customer;
 import util.CrudUtil;
 
@@ -15,14 +14,8 @@ public class CustomerController implements CustomerService {
         try {
             String sql = "INSERT INTO customer VALUES(?,?,?,?,?,?,?,?,?)";
 
-            boolean isAdded;
 
-            isAdded = CrudUtil.execute(sql, newCustomer.getId(), newCustomer.getTitle(), newCustomer.getName(), newCustomer.getDob(), newCustomer.getSalary(), newCustomer.getAddress(), newCustomer.getCity(), newCustomer.getProvince(), newCustomer.getPostalCode());
-            if (isAdded) {
-                return true;
-            } else {
-                return false;
-            }
+            return CrudUtil.execute(sql, newCustomer.getId(), newCustomer.getTitle(), newCustomer.getName(), newCustomer.getDob(), newCustomer.getSalary(), newCustomer.getAddress(), newCustomer.getCity(), newCustomer.getProvince(), newCustomer.getPostalCode());
         } catch (SQLException e) {
             return false;
         }
@@ -30,14 +23,9 @@ public class CustomerController implements CustomerService {
 
     @Override
     public boolean deleteCustomer(String customerID) {
-        String SQL = "DELETE FROM Customer WHERE CustID= '" + customerID + "'";
+        String sql = "DELETE FROM Customer WHERE CustID= '" + customerID + "'";
         try {
-            Boolean isDeleted = CrudUtil.execute(SQL);
-            if (isDeleted) {
-                return true;
-            } else {
-                return false;
-            }
+            return CrudUtil.execute(sql);
         } catch (SQLException e) {
             return false;
         }
@@ -45,15 +33,11 @@ public class CustomerController implements CustomerService {
 
     @Override
     public boolean updateCustomer(Customer customer) {
-        String SQl = "Update customer SET CustName=?, CustTitle=?, DOB=?,  salary=?,  CustAddress=?, City=?, Province=?, PostalCode=? WHERE CustID=?";
+        String sql = "Update customer SET CustName=?, CustTitle=?, DOB=?,  salary=?,  CustAddress=?, City=?, Province=?, PostalCode=? WHERE CustID=?";
         try {
-            Boolean isUpdated = CrudUtil.execute(SQl, customer.getName(), customer.getTitle(), customer.getDob(), customer.getSalary(), customer.getAddress(), customer.getCity(), customer.getProvince(), customer.getPostalCode(), customer.getId());
 
-            if (isUpdated) {
-                return true;
-            } else {
-                return false;
-            }
+            return (CrudUtil.execute(sql, customer.getName(), customer.getTitle(), customer.getDob(), customer.getSalary(), customer.getAddress(), customer.getCity(), customer.getProvince(), customer.getPostalCode(), customer.getId()));
+
         } catch (SQLException e) {
             return false;
         }
@@ -61,12 +45,13 @@ public class CustomerController implements CustomerService {
 
     @Override
     public Customer searchCustomer(String customerID) {
-        String SQL = "SELECT * FROM customer WHERE CustID=?";
+        String sql = "SELECT * FROM customer WHERE CustID=?";
         try {
 
-            ResultSet resultSet = CrudUtil.execute(SQL, customerID);
-            if (resultSet.next()) {
-                return new Customer(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getDate(4).toLocalDate(), resultSet.getDouble(5), resultSet.getString(6), resultSet.getString(7), resultSet.getString(8), resultSet.getString(9));
+            try (ResultSet resultSet = CrudUtil.execute(sql, customerID)) {
+                if (resultSet.next()) {
+                    return new Customer(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getDate(4).toLocalDate(), resultSet.getDouble(5), resultSet.getString(6), resultSet.getString(7), resultSet.getString(8), resultSet.getString(9));
+                }
             }
 
         } catch (SQLException e) {
@@ -92,7 +77,7 @@ public class CustomerController implements CustomerService {
 
 
         } catch (SQLException e) {
-            return null;
+            return customerObservableList;
         }
     }
 }

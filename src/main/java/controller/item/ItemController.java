@@ -2,7 +2,6 @@ package controller.item;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
 import model.Item;
 import util.CrudUtil;
 
@@ -12,10 +11,10 @@ import java.sql.SQLException;
 public class ItemController implements ItemService {
     @Override
     public boolean addItem(Item item) {
-        String SQl = "INSERT INTO item VALUES(?,?,?,?,?)";
+        String sql = "INSERT INTO item VALUES(?,?,?,?,?)";
         try {
             return CrudUtil.execute(
-                    SQl,
+                    sql,
                     item.getItemCode(),
                     item.getDescription(),
                     item.getPackSize(),
@@ -31,19 +30,15 @@ public class ItemController implements ItemService {
     @Override
     public boolean updateItem(Item item) {
 
-        String SQL = "UPDATE item SET Description=?, PackSize=?, UnitPrice=?, QtyOnHand=? WHERE ItemCode=?";
+        String sql = "UPDATE item SET Description=?, PackSize=?, UnitPrice=?, QtyOnHand=? WHERE ItemCode=?";
 
         try {
-            if (CrudUtil.execute(SQL,
+            return CrudUtil.execute(sql,
                     item.getDescription(),
                     item.getPackSize(),
                     item.getUnitPrice(),
                     item.getQtyOnHand(),
-                    item.getItemCode())) {
-                return true;
-            } else {
-                return false;
-            }
+                    item.getItemCode());
         } catch (SQLException e) {
             return false;
         }
@@ -52,16 +47,17 @@ public class ItemController implements ItemService {
     @Override
     public Item searchItem(String itemCode) {
         try {
-            String SQL = "SELECT * FROM item WHERE ItemCode=?";
-            ResultSet resultSet = CrudUtil.execute(SQL, itemCode);
-            resultSet.next();
-            return new Item(
-                    resultSet.getString(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3),
-                    resultSet.getDouble(4),
-                    resultSet.getInt(5)
-            );
+            String sql = "SELECT * FROM item WHERE ItemCode=?";
+            try (ResultSet resultSet = CrudUtil.execute(sql, itemCode)) {
+                resultSet.next();
+                return new Item(
+                        resultSet.getString(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getDouble(4),
+                        resultSet.getInt(5)
+                );
+            }
         } catch (SQLException e) {
             return null;
         }
@@ -69,9 +65,9 @@ public class ItemController implements ItemService {
 
     @Override
     public boolean deleteItem(String itemCode) {
-        String SQl = "DELETE FROM item WHERE ItemCode=?";
+        String sql = "DELETE FROM item WHERE ItemCode=?";
         try {
-            if (CrudUtil.execute(SQl, itemCode)) {
+            if (CrudUtil.execute(sql, itemCode)) {
                 return true;
             }
         } catch (SQLException e) {
@@ -83,19 +79,20 @@ public class ItemController implements ItemService {
     @Override
     public ObservableList<Item> getAllItem() {
         ObservableList<Item> itemObservableList = FXCollections.observableArrayList();
-        String SQL = "SELECT * FROM item";
+        String sql = "SELECT * FROM item";
 
         try {
-            ResultSet resultSet = CrudUtil.execute(SQL);
+            try (ResultSet resultSet = CrudUtil.execute(sql)) {
 
-            while (resultSet.next()) {
-                itemObservableList.add(new Item(
-                        resultSet.getString(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getDouble(4),
-                        resultSet.getInt(5)
-                ));
+                while (resultSet.next()) {
+                    itemObservableList.add(new Item(
+                            resultSet.getString(1),
+                            resultSet.getString(2),
+                            resultSet.getString(3),
+                            resultSet.getDouble(4),
+                            resultSet.getInt(5)
+                    ));
+                }
             }
             return itemObservableList;
         } catch (SQLException e) {
