@@ -1,0 +1,105 @@
+package controller.item;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import model.Item;
+import util.CrudUtil;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class ItemController implements ItemService {
+    @Override
+    public boolean addItem(Item item) {
+        String SQl = "INSERT INTO item VALUES(?,?,?,?,?)";
+        try {
+            return CrudUtil.execute(
+                    SQl,
+                    item.getItemCode(),
+                    item.getDescription(),
+                    item.getPackSize(),
+                    item.getUnitPrice(),
+                    item.getQtyOnHand()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public boolean updateItem(Item item) {
+
+        String SQL = "UPDATE item SET Description=?, PackSize=?, UnitPrice=?, QtyOnHand=? WHERE ItemCode=?";
+
+        try {
+            if (CrudUtil.execute(SQL,
+                    item.getDescription(),
+                    item.getPackSize(),
+                    item.getUnitPrice(),
+                    item.getQtyOnHand(),
+                    item.getItemCode())) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public Item searchItem(String itemCode) {
+        try {
+            String SQL = "SELECT * FROM item WHERE ItemCode=?";
+            ResultSet resultSet = CrudUtil.execute(SQL, itemCode);
+            resultSet.next();
+            return new Item(
+                    resultSet.getString(1),
+                    resultSet.getString(2),
+                    resultSet.getString(3),
+                    resultSet.getDouble(4),
+                    resultSet.getInt(5)
+            );
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean deleteItem(String itemCode) {
+        String SQl = "DELETE FROM item WHERE ItemCode=?";
+        try {
+            if (CrudUtil.execute(SQl, itemCode)) {
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+        return false;
+    }
+
+    @Override
+    public ObservableList<Item> getAllItem() {
+        ObservableList<Item> itemObservableList = FXCollections.observableArrayList();
+        String SQL = "SELECT * FROM item";
+
+        try {
+            ResultSet resultSet = CrudUtil.execute(SQL);
+
+            while (resultSet.next()) {
+                itemObservableList.add(new Item(
+                        resultSet.getString(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getDouble(4),
+                        resultSet.getInt(5)
+                ));
+            }
+            return itemObservableList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
